@@ -3,20 +3,22 @@ from .models import News, Category
 from .forms import NewsForm
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
+from django.db.models import Q, Count
 
 
 class NewsList(ListView):
     model = News
     template_name = 'news/index_news_list.html'
     context_object_name = 'news'
+    # queryset = News.objects.select_related('category')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(NewsList, self).get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()
+        context['categories'] = Category.objects.annotate(cnt=Count('get_news')).filter(cnt__gt=0)
         return context
 
     def get_queryset(self):
-        return News.objects.filter(is_published=True)
+        return News.objects.filter(is_published=True).select_related('category')
 
 
 # def index(request):
@@ -40,7 +42,7 @@ class NewsByCategory(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(NewsByCategory, self).get_context_data()
-        context['categories'] = Category.objects.all()
+        context['categories'] = Category.objects.annotate(cnt=Count('get_news')).filter(cnt__gt=0)
         return context
 
 
