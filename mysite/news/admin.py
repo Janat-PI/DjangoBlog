@@ -1,13 +1,20 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
+
 from .models import News, Category
 
 
 class NewsAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'category', 'created_at', 'update_at', 'is_published', 'views']
+    list_display = ['id', 'title', 'category', 'created_at', 'update_at', 'is_published', 'views', 'get_photo']
     search_fields = ['title']
     list_display_links = ['id', 'title']
     list_editable = ['is_published', 'views']
     list_filter = ('is_published', 'category')
+    # fields =
+
+    def get_photo(self, obj):
+        if obj.photo:
+            return mark_safe(f'<img src="{obj.photo.url}" width="90"')
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -18,3 +25,6 @@ class CategoryAdmin(admin.ModelAdmin):
 
 admin.site.register(News, NewsAdmin)
 admin.site.register(Category, CategoryAdmin)
+
+admin.site.site_title = 'Управления новостями'
+admin.site.site_header = 'Управления новостями'

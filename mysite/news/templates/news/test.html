@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <title>Title</title>
+</head>
+<body>
+
+{% for name in page_obj.object_list %}
+    <p>name</p>
+{% endfor %}
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+      {% for p in page_obj.paginator.page_range %}
+    <li class="page-item"><a class="page-link" href="?page={{ p }}">{{p}}</a></li>
+      {% endfor %}
+  </ul>
+</nav>
+
+</body>
+</html>

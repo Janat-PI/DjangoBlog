@@ -23,9 +23,14 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Home</a>
             </li>
+            {% if request.user.is_authenticated %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'add-news' %}">Add news</a>
             </li>
+            {% endif %}
+            <span class="navbar-text">
+              <a href="{% url 'register' %}"> Register </a> | <a href="{% url 'login' %}">Login</a>
+            </span>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Dropdown
@@ -49,9 +54,17 @@
       </div>
   </nav>
 {% endblock %}
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">{{ message }} </div>
+      {% else %}
+        <div class="alert alert-{{ message.tags }}" role="alert">{{ message }} </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
   {% block content %}
   <div class="container mt-3">
-      <h1> Listing news </h1>
       <div class="row">
         <div class="col-md-4">
           <div class="list-group">
@@ -62,6 +75,7 @@
         </div>
 
         <div class="col-md-8">
+          {{ mixin_prop }}
         {% for item in news %}
           <div class="card mb-3">
               <div class="card-header">
@@ -86,8 +100,29 @@
         {% endfor %}
         </div>
       </div>
+      {% if page_obj.has_other_pages %}
+     <nav aria-label="Page navigation example">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+      {% endif %}
+        {% for p in page_obj.paginator.page_range %}
+          {% if page_obj.number == p %}
+            <li class="page-item active" aria-current="page"><a class="page-link" href="?page={{ p }}">{{p}}</a></li>
+          {%elif p > page_obj.number|add:-3 and p < page_obj.number|add:3%}
+              <li class="page-item"><a class="page-link" href="?page={{ p }}">{{p}}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+        {% endif %}
+    </ul>
+  </nav>
+      {% endif %}
   </div>
   {% endblock %}
+
+
 
     <!-- Optional JavaScript; choose one of the two! -->
 

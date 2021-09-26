@@ -3,18 +3,33 @@ from .models import News, Category
 from .forms import NewsForm
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F
+from .utils import MyMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 
 
-class NewsList(ListView):
+def test(request):
+    objects = News.objects.filter(is_published=True)
+    paginator = Paginator(objects, 2)
+    page_num = request.GET.get('page', 1)
+    page_objects = paginator.get_page(page_num)
+    return render(request, 'news/test.html', {'page_obj': page_objects})
+
+
+class NewsList(MyMixin, ListView):
     model = News
     template_name = 'news/index_news_list.html'
     context_object_name = 'news'
     # queryset = News.objects.select_related('category')
+    mixin_prop = 'hello worlds'
+    paginate_by = 2
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(NewsList, self).get_context_data(**kwargs)
-        context['categories'] = Category.objects.annotate(cnt=Count('get_news')).filter(cnt__gt=0)
+        context['categories'] = self.test()
+        context['mixin_prop'] = self.get_upper('test')
+
         return context
 
     def get_queryset(self):
@@ -31,18 +46,19 @@ class NewsList(ListView):
 #     return render(request, 'news/index.html', context=context)
 
 
-class NewsByCategory(ListView):
+class NewsByCategory(MyMixin, ListView):
     model = News
     context_object_name = 'news'
     template_name = 'news/index_news_list.html'
     allow_empty = False
+    paginate_by = 2
 
     def get_queryset(self):
         return News.objects.filter(category_id=self.kwargs['category_id'], is_published=True)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(NewsByCategory, self).get_context_data()
-        context['categories'] = Category.objects.annotate(cnt=Count('get_news')).filter(cnt__gt=0)
+        context['categories'] = self.test()
         return context
 
 
@@ -77,16 +93,21 @@ def add_news(request):
     return render(request, template_name='news/add_news.html', context={'form': form})
 
 
-class ViewNews(DetailView):
+class ViewNews(MyMixin, DetailView):
     model = News
     pk_url_kwarg = 'news_id'
     # slug_url_kwarg = '' это для слага
     context_object_name = 'news'
 
+    def get_queryset(self):
+        return News.objects.filter(id=self.kwargs['news_id'])
 
-class CreateNewsView(CreateView):
+
+class CreateNewsView(LoginRequiredMixin, CreateView):
     form_class = NewsForm
     template_name = 'news/add_news.html'
     # success_url = reverse_lazy('index')
+    raise_exception = True
+    # login_url = '/admin/'
 
 
