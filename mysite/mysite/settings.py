@@ -40,7 +40,11 @@ INSTALLED_APPS = [
     # my app's
     'news.apps.NewsConfig',
     'debug_toolbar',
-    'account'
+    'account',
+    'sendmessages',
+    'ckeditor',
+    'ckeditor_uploader',
+    'captcha',
 ]
 
 MIDDLEWARE = [
@@ -127,7 +131,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'news/static'),
-    os.path.join(BASE_DIR, 'account/static')
+    os.path.join(BASE_DIR, 'account/static'),
+    os.path.join(BASE_DIR, 'sendmessages/static')
 ]
 
 
@@ -142,3 +147,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "janat.200066@gmail.com"
+EMAIL_HOST_PASSWORD = "kfjttoizzwvulsps"
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+CKEDITOR_UPLOAD_PATH = "uploads/"

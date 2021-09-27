@@ -21,7 +21,10 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('news/', include('news.urls')),
-    path('account/', include('account.urls'))
+    path('account/', include('account.urls')),
+    path('send/', include('sendmessages.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('captcha/', include('captcha.urls')),
 ]
 
 if settings.DEBUG:
